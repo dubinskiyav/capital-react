@@ -1,5 +1,30 @@
-body {
+body { /* Именно так, без точки */
     font: 14px "Century Gothic", Futura, sans-serif;
     margin: 0px;
     border: solid 2px red;
+}
+.Header { /* Полоска сверху */
+    background-color: #f1f1f1c5;
+    color: black;
+    width: 100%; /* Надо, так как вложенные элементы прибиваются по сторонам */
+    overflow: hidden; /* Отменяем действие float */
+    border: solid 2px rgb(43, 255, 0);
+    min-height: 50px;
+}
+.Module { /* Основаня панель */
+    background: Lime; 
+    background-color: #f1f1f1ef;
+    margin-bottom1: 40px; /* Чтобы не залезало под footer */
+    border: solid 2px rgb(25, 0, 255);
+    min-height: 100px;
+}
+.Footer { /* Полоска снизу  */
+    border: solid 2px rgb(0, 255, 21);
+    position: fixed; /* Фиксированное положение */
+    bottom: 0; /* Внизу */
+    width: 100%; /* Надо, так как вложенные элементы прибиваются по сторонам */
+    height: 60px;
+    background-color: #6b6262;
+    color: black;
+    overflow: hidden; /* Отменяем действие float */
 }
