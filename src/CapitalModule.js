@@ -1,11 +1,12 @@
 import React from 'react';
-import Measure from './Measure';
-class Module extends React.Component {
+import Unitmeasure from './Unitmeasure';
+import Material from './Material';
+class CapitalModule extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       modules: [
-        { name: "Measure", note: "Единицы измерения"},
+        { name: "Unitmeasure", note: "Единицы измерения"},
         { name: "Material", note: "Справочник материалов"},
       ],
       current: -1,
@@ -17,14 +18,16 @@ class Module extends React.Component {
   render() {
     switch(this.state.current) {
       case 0:
-        return <Measure />;
+        return <Unitmeasure />;
+      case 1:
+        return <Material />;
       default:
         return (
-          <div className="Module">
-            <div className="Module-row">
+          <div className="CapitalModule">
+            <div className="CapitalModule-row">
               {this.state.modules.map((module, index) => (
                 <button
-                  className="moduleButton"
+                  className="CapitalModuleButton"
                   key={index}
                   onClick={() => this.handleClick({index})}
                 >
@@ -37,4 +40,4 @@ class Module extends React.Component {
     }
   }
 }
-export default Module;
+export default CapitalModule;
