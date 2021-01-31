@@ -3,16 +3,18 @@ import 'antd/dist/antd.css';
 import './index.css';
 import './capital.css';
 import { Layout, Menu, Breadcrumb } from 'antd';
-import { Table, Tag, Space } from 'antd';
-import { Button } from 'antd';
+import { Table, Button } from 'antd';
+import reqwest from 'reqwest';
 
 const { Header, Content, Footer } = Layout;
 
+//var express = require('express')
+//var cors = require('cors')
+//var app = express()
+//app.use(cors())
+
+// id не надо
 const columns = [
-  {
-    title: 'id',
-    dataIndex: 'id',
-  },
   {
     title: 'Наименование',
     dataIndex: 'name',
@@ -23,25 +25,42 @@ const columns = [
   },
 ];
 
+// В key записываем id
 const data = [
-  {id: 1, name: "Метр", short_name: "м"},
-  {id: 2, name: "Килограмм", short_name: "кг"},
-  {id: 3, name: "Секунда", short_name: "с"},
-  {id: 4, name: "Ампер", short_name: "А"},
-  {id: 5, name: "Кельвин", short_name: "К"},
-  {id: 6, name: "Моль", short_name: "моль"},
-  {id: 7, name: "Кандела", short_name: "кд"},
+  {key: 1, name: "Метр", short_name: "м"},
+  {key: 2, name: "Килограмм", short_name: "кг"},
+  {key: 3, name: "Секунда", short_name: "с"},
+  {key: 4, name: "Ампер", short_name: "А"},
+  {key: 5, name: "Кельвин", short_name: "К"},
+  {key: 6, name: "Моль", short_name: "моль"},
+  {key: 7, name: "Кандела", short_name: "кд"},
 ];
 
 
 class Unitmeasure extends React.Component {
   state = {
     selectedRowKeys: [], // Check here to configure the default column
+    gridDataOption: {
+      pageNumber: null,
+      pageSize: null,
+      sort: [{fieldName: "name", direction: "ASC"}]
+    },
     loading: false,
   };
   start = () => {
+
     this.setState({ loading: true });
     // ajax request after empty completing
+    console.log("Unitmeasure - start");
+    reqwest({
+      url: 'http://localhost:8080/capital/unitmeasure/json',
+      method: 'post',
+      type: 'json',
+      data: this.state.gridDataOption,
+    }).then(data => {
+      console.log(data);
+    });
+
     setTimeout(() => {
       this.setState({
         selectedRowKeys: [],
