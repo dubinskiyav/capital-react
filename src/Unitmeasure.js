@@ -27,13 +27,13 @@ const columns = [
 
 // В key записываем id
 const data = [
-  {key: 1, name: "Метр", short_name: "м"},
-  {key: 2, name: "Килограмм", short_name: "кг"},
-  {key: 3, name: "Секунда", short_name: "с"},
-  {key: 4, name: "Ампер", short_name: "А"},
-  {key: 5, name: "Кельвин", short_name: "К"},
-  {key: 6, name: "Моль", short_name: "моль"},
-  {key: 7, name: "Кандела", short_name: "кд"},
+  {key: 1, name: "1 Метр", short_name: "м"},
+  {key: 2, name: "1 Килограмм", short_name: "кг"},
+  {key: 3, name: "1 Секунда", short_name: "с"},
+  {key: 4, name: "1 Ампер", short_name: "А"},
+  {key: 5, name: "1 Кельвин", short_name: "К"},
+  {key: 6, name: "1 Моль", short_name: "моль"},
+  {key: 7, name: "1 Кандела", short_name: "кд"},
 ];
 
 
@@ -41,8 +41,8 @@ class Unitmeasure extends React.Component {
   state = {
     selectedRowKeys: [], // Check here to configure the default column
     gridDataOption: {
-      pageNumber: null,
-      pageSize: null,
+      pageNumber: 1,
+      pageSize: 5,
       sort: [{fieldName: "name", direction: "ASC"}]
     },
     loading: false,
@@ -54,9 +54,10 @@ class Unitmeasure extends React.Component {
     console.log("Unitmeasure - start");
     reqwest({
       url: 'http://localhost:8080/capital/unitmeasure/json',
+      contentType: "application/json; charset=utf-8",
       method: 'post',
       type: 'json',
-      data: this.state.gridDataOption,
+      data:JSON.stringify(this.state.gridDataOption)
     }).then(data => {
       console.log(data);
     });
