@@ -32,26 +32,17 @@ class Unitmeasure extends React.Component {
       pageSize: 7,
     },
     selectedRowKeys: [], // Check here to configure the default column
-    gridDataOption: {
-      pageNumber: 0,
-      pageSize: 7,
-      sort: [{fieldName: "id"}]
-    },
     loading: false,
   };
   // размещаем побочные эффекты
   componentDidMount() {
     console.log("componentDidMount - start")
     const { pagination } = this.state;
-    this.state.gridDataOption.pageNumber = pagination.current - 1;
-    this.state.gridDataOption.pageSize = pagination.pageSize;
     this.fetch({ pagination });
     console.log("componentDidMount - finish")
   }
   handleTableChange = (pagination, filters, sorter) => {
     console.log("handleTableChange - start");
-    this.state.gridDataOption.pageNumber = pagination.current - 1;
-    this.state.gridDataOption.pageSize =  pagination.pageSize;
     console.log("sorter.field=" + sorter.field);
     console.log("sorter.order=" + sorter.order);
     this.fetch({
@@ -65,13 +56,25 @@ class Unitmeasure extends React.Component {
   fetch = (params = {}) => {
     console.log("fetch - start");
     this.setState({ loading: true });
+    const gridDataOption = {
+      pageNumber: params.pagination.current - 1,
+      pageSize: params.pagination.pageSize,
+      sort: [{fieldName: "1"}]
+    };
+    if (params.sortField) {
+      console.log("params.sortField=" + params.sortField);
+      gridDataOption.sort[0].fieldName = params.sortField;
+      if (params.sortOrder == "descend") {
+        console.log("params.sortOrder=descend");
+      }
+    }
     // ajax request after empty completing
     reqwest({
       url: 'http://localhost:8080/unitmeasure/json',
       contentType: "application/json; charset=utf-8",
       method: 'post',
       type: 'json',
-      data:JSON.stringify(this.state.gridDataOption)
+      data:JSON.stringify(gridDataOption)
     }).then(data => {
       //console.log(data);
       this.setState({
