@@ -43,11 +43,15 @@ class Unitmeasure extends React.Component {
   componentDidMount() {
     console.log("componentDidMount - start")
     const { pagination } = this.state;
+    this.state.gridDataOption.pageNumber = pagination.current - 1;
+    this.state.gridDataOption.pageSize = pagination.pageSize;
     this.fetch({ pagination });
     console.log("componentDidMount - finish")
   }
   handleTableChange = (pagination, filters, sorter) => {
     console.log("handleTableChange - start");
+    this.state.gridDataOption.pageNumber = pagination.current - 1;
+    this.state.gridDataOption.pageSize =  pagination.pageSize;
     console.log("sorter.field=" + sorter.field);
     console.log("sorter.order=" + sorter.order);
     this.fetch({
