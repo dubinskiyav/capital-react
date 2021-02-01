@@ -39,11 +39,13 @@ const data = [
 
 class Unitmeasure extends React.Component {
   state = {
+    data: data,
+    data1: [],
     selectedRowKeys: [], // Check here to configure the default column
     gridDataOption: {
-      pageNumber: 1,
-      pageSize: 5,
-      sort: [{fieldName: "name", direction: "ASC"}]
+      pageNumber: 0,
+      pageSize: 7,
+      sort: [{fieldName: "id"}]
     },
     loading: false,
   };
@@ -53,13 +55,18 @@ class Unitmeasure extends React.Component {
     // ajax request after empty completing
     console.log("Unitmeasure - start");
     reqwest({
-      url: 'http://localhost:8080/capital/unitmeasure/json',
+      url: 'http://localhost:8080/unitmeasure/json',
       contentType: "application/json; charset=utf-8",
       method: 'post',
       type: 'json',
       data:JSON.stringify(this.state.gridDataOption)
     }).then(data => {
       console.log(data);
+      this.setState({
+        loading: false,
+        data: data
+      });
+      console.log("Unitmeasure - setState Ok");
     });
 
     setTimeout(() => {
@@ -74,7 +81,7 @@ class Unitmeasure extends React.Component {
     this.setState({ selectedRowKeys });
   };
   render() {
-    const { loading, selectedRowKeys } = this.state;
+    const { data, loading, selectedRowKeys } = this.state;
     const rowSelection = {
       selectedRowKeys,
       onChange: this.onSelectChange,
@@ -95,7 +102,12 @@ class Unitmeasure extends React.Component {
                     {hasSelected ? `Selected ${selectedRowKeys.length} items` : ''}
                   </span>
                 </div>
-                <Table rowSelection={rowSelection} columns={columns} dataSource={data} />
+                <Table 
+                  rowSelection={rowSelection} 
+                  columns={columns} 
+                  dataSource={data}
+
+                />
               </div>
             </Content>
             <Footer>Низ Капитал</Footer>
