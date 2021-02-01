@@ -8,39 +8,29 @@ import reqwest from 'reqwest';
 
 const { Header, Content, Footer } = Layout;
 
-//var express = require('express')
-//var cors = require('cors')
-//var app = express()
-//app.use(cors())
-
 // id не надо
 const columns = [
   {
     title: 'Наименование',
     dataIndex: 'name',
+    sorter: true,
+    width: '20%',
   },
   {
     title: 'Сокращение',
-    dataIndex: 'short_name',
+    dataIndex: 'shortName',
+    sorter: true,
+    width: '10%',
   },
 ];
 
-// В key записываем id
-const data = [
-  {key: 1, name: "1 Метр", short_name: "м"},
-  {key: 2, name: "1 Килограмм", short_name: "кг"},
-  {key: 3, name: "1 Секунда", short_name: "с"},
-  {key: 4, name: "1 Ампер", short_name: "А"},
-  {key: 5, name: "1 Кельвин", short_name: "К"},
-  {key: 6, name: "1 Моль", short_name: "моль"},
-  {key: 7, name: "1 Кандела", short_name: "кд"},
-];
-
-
 class Unitmeasure extends React.Component {
   state = {
-    data: data,
-    data1: [],
+    data: [],
+    pagination: {
+      current: 1,
+      pageSize: 7,
+    },
     selectedRowKeys: [], // Check here to configure the default column
     gridDataOption: {
       pageNumber: 0,
@@ -49,11 +39,29 @@ class Unitmeasure extends React.Component {
     },
     loading: false,
   };
-  start = () => {
-
+  // размещаем побочные эффекты
+  componentDidMount() {
+    console.log("componentDidMount - start")
+    const { pagination } = this.state;
+    this.fetch({ pagination });
+    console.log("componentDidMount - finish")
+  }
+  handleTableChange = (pagination, filters, sorter) => {
+    console.log("handleTableChange - start");
+    console.log("sorter.field=" + sorter.field);
+    console.log("sorter.order=" + sorter.order);
+    this.fetch({
+      sortField: sorter.field,
+      sortOrder: sorter.order,
+      pagination,
+      ...filters,
+    });
+    console.log("handleTableChange - finish");
+  };
+  fetch = (params = {}) => {
+    console.log("fetch - start");
     this.setState({ loading: true });
     // ajax request after empty completing
-    console.log("Unitmeasure - start");
     reqwest({
       url: 'http://localhost:8080/unitmeasure/json',
       contentType: "application/json; charset=utf-8",
@@ -61,32 +69,24 @@ class Unitmeasure extends React.Component {
       type: 'json',
       data:JSON.stringify(this.state.gridDataOption)
     }).then(data => {
-      console.log(data);
+      //console.log(data);
       this.setState({
         loading: false,
-        data: data
+        data: data,
+        pagination: {
+          ...params.pagination,
+          total: 200,
+          // 200 is mock data, you should read it from server
+          // total: data.totalCount,
+        },
       });
-      console.log("Unitmeasure - setState Ok");
+      console.log("fetch - finish");
     });
+  };
 
-    setTimeout(() => {
-      this.setState({
-        selectedRowKeys: [],
-        loading: false,
-      });
-    }, 1000);
-  };
-  onSelectChange = selectedRowKeys => {
-    console.log('selectedRowKeys changed: ', selectedRowKeys);
-    this.setState({ selectedRowKeys });
-  };
   render() {
-    const { data, loading, selectedRowKeys } = this.state;
-    const rowSelection = {
-      selectedRowKeys,
-      onChange: this.onSelectChange,
-    };
-    const hasSelected = selectedRowKeys.length > 0;
+    console.log("render - start");
+    const { data, pagination, loading } = this.state;
     return (
       <div className="CapitalModule">
         <div className="Unitmeasure">
@@ -94,19 +94,12 @@ class Unitmeasure extends React.Component {
             <Header>Справочник единиц измерения</Header>
             <Content>
               <div>
-                <div style={{ marginBottom: 16 }}>
-                  <Button type="primary" onClick={this.start} disabled={!hasSelected} loading={loading}>
-                    Reload
-                  </Button>
-                  <span style={{ marginLeft: 8 }}>
-                    {hasSelected ? `Selected ${selectedRowKeys.length} items` : ''}
-                  </span>
-                </div>
                 <Table 
-                  rowSelection={rowSelection} 
                   columns={columns} 
                   dataSource={data}
-
+                  pagination={pagination}
+                  loading={loading}
+                  onChange={this.handleTableChange}
                 />
               </div>
             </Content>
