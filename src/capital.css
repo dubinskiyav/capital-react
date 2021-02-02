@@ -1,7 +1,14 @@
 .ant-layout-header {
   height1: 64px;
   padding1: 0 50px;
-  color: rgba(226, 21, 21, 0.85);
+  color: rgba(76, 21, 226, 0.85);
   line-height1: 64px;
   background: #d2e2f0;
+}
+.ant-layout-footer {
+  height1: 64px;
+  padding1: 0 50px;
+  color: rgba(226, 79, 21, 0.85);
+  line-height1: 64px;
+  background: #d2f0dc;
 }

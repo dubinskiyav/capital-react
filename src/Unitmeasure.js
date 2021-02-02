@@ -2,9 +2,10 @@ import React from 'react';
 import 'antd/dist/antd.css';
 import './index.css';
 import './capital.css';
-import { Layout, Menu, Breadcrumb } from 'antd';
-import { Table, Button } from 'antd';
+import { Layout } from 'antd';
+import { Table } from 'antd';
 import reqwest from 'reqwest';
+import { Space } from 'antd';
 
 const { Header, Content, Footer } = Layout;
 
@@ -22,14 +23,25 @@ const columns = [
     sorter: true,
     width: '10%',
   },
+  {
+    title: 'Действие',
+    key: 'action',
+    render: (text, record) => (
+      <Space size="middle">
+        <a>Удалить</a>
+      </Space>
+    ),
+  },
 ];
+
+
 
 class Unitmeasure extends React.Component {
   state = {
     data: [],
     pagination: {
       current: 1,
-      pageSize: 7,
+      pageSize: 10,
     },
     selectedRowKeys: [], // Check here to configure the default column
     loading: false,
@@ -59,12 +71,13 @@ class Unitmeasure extends React.Component {
     const gridDataOption = {
       pageNumber: params.pagination.current - 1,
       pageSize: params.pagination.pageSize,
-      sort: [{fieldName: "1"}]
+      sort: [{fieldName: "id"}]
     };
     if (params.sortField) {
       console.log("params.sortField=" + params.sortField);
       gridDataOption.sort[0].fieldName = params.sortField;
-      if (params.sortOrder == "descend") {
+      if (params.sortOrder === "descend") {
+        gridDataOption.sort[0].direction = 1;
         console.log("params.sortOrder=descend");
       }
     }
