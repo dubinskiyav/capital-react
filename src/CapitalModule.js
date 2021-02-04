@@ -1,4 +1,5 @@
 import React from 'react';
+import Measure from './Measure';
 import Unitmeasure from './Unitmeasure';
 import Material from './Material';
 class CapitalModule extends React.Component {
@@ -6,6 +7,7 @@ class CapitalModule extends React.Component {
     super(props);
     this.state = {
       modules: [
+        { name: "Masure", note: "Меры измерения"},
         { name: "Unitmeasure", note: "Единицы измерения"},
         { name: "Material", note: "Справочник материалов"},
       ],
@@ -18,10 +20,12 @@ class CapitalModule extends React.Component {
   render() {
     switch(this.state.current) {
       case 0:
-        return <Unitmeasure />;
+        return <Measure />;
       case 1:
+        return <Unitmeasure />;
+      case 2:
         return <Material />;
-      default:
+        default:
         return (
           <div className="CapitalModule">
             <div className="CapitalModule-row">

@@ -3,9 +3,8 @@ import 'antd/dist/antd.css';
 import './index.css';
 import './capital.css';
 import { Layout } from 'antd';
-import { Table } from 'antd';
+import { Table, Button } from 'antd';
 import reqwest from 'reqwest';
-import { Space } from 'antd';
 
 const { Header, Content, Footer } = Layout;
 
@@ -15,25 +14,20 @@ const columns = [
     title: 'Наименование',
     dataIndex: 'name',
     sorter: true,
-    width: '20%',
-  },
-  {
-    title: 'Сокращение',
-    dataIndex: 'shortName',
-    sorter: true,
-    width: '10%',
+    width1: '20%',
   },
 ];
 
-class Unitmeasure extends React.Component {
+class Measure extends React.Component {
   state = {
     data: [],
     pagination: {
       current: 1,
       pageSize: 10,
     },
-    selectedRowKeys: [], // Check here to configure the default column
+    selectedRowKeys: [], 
     loading: false,
+    totalMax: 0, // Наибольшее количесвто выбранных записей
   };
   // размещаем побочные эффекты
   componentDidMount() {
@@ -54,7 +48,6 @@ class Unitmeasure extends React.Component {
     });
     console.log("handleTableChange - finish");
   };
-
   fetch = (params = {}) => {
     console.log("fetch - start");
     this.setState({ loading: true });
@@ -71,9 +64,15 @@ class Unitmeasure extends React.Component {
         console.log("params.sortOrder=descend");
       }
     }
+    var total = (gridDataOption.pageNumber + 2) * gridDataOption.pageSize;
+    if (total < this.state.totalMax) {
+      total = this.state.totalMax;
+    } else {
+      this.state.totalMax = total;
+    }
     // ajax request after empty completing
     reqwest({
-      url: 'http://localhost:8080/unitmeasure/json',
+      url: 'http://localhost:8080/measure/json',
       contentType: "application/json; charset=utf-8",
       method: 'post',
       type: 'json',
@@ -85,27 +84,38 @@ class Unitmeasure extends React.Component {
         data: data,
         pagination: {
           ...params.pagination,
-          total: 200,
+          total: total,
           // 200 is mock data, you should read it from server
           // total: data.totalCount,
         },
+        selectedRowKeys: [], // снимем все отметки
       });
       console.log("fetch - finish");
     });
   };
-  
+
+  onSelectChange = selectedRowKeys => {
+    console.log('selectedRowKeys changed: ', selectedRowKeys);
+    this.setState({ selectedRowKeys });
+  };
 
   render() {
     console.log("render - start");
-    const { data, pagination, loading } = this.state;
+    const { data, pagination, loading, selectedRowKeys} = this.state;
+    const rowSelection = {
+      selectedRowKeys,
+      onChange: this.onSelectChange,
+    };
+    const hasSelected = selectedRowKeys.length > 0;
     return (
       <div className="CapitalModule">
-        <div className="Unitmeasure">
+        <div className="Measure">
         <Layout>
-            <Header>Справочник единиц измерения</Header>
+            <Header>Справочник мер измерения</Header>
             <Content>
               <div>
                 <Table 
+                  rowSelection={rowSelection} 
                   columns={columns} 
                   dataSource={data}
                   pagination={pagination}
@@ -121,4 +131,4 @@ class Unitmeasure extends React.Component {
     );
   }
 }
-export default Unitmeasure;
+export default Measure;
