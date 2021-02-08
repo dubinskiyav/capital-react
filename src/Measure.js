@@ -104,19 +104,39 @@ class Measure extends React.Component {
     this.setState({ selectedRowKeys });
   };
 
+  deleteRows() {
+    const { selectedRowKeys } = this.state;
+    let ids = selectedRowKeys.join(',');
+    console.log('Deleting records ', ids, ' ...');
+
+    reqwest({
+      url: 'http://localhost:8080/measure/del/' + ids,
+      contentType: "application/json; charset=utf-8",
+      method: 'post',
+      type: 'json',
+    }).then((responseJson) => {
+      return;
+    }).catch((error) => {
+        throw (error);
+    });
+  }
+
   handleMenuClick = e => {
     console.log('click ', e);
     const { key } = e;
     this.setState({ currentMenu: key });
-    this.setState(function(key){
-      return {currentMenu: key}
-   });
-   this.setState({ currentMenu: 'aaa' });
-   console.log('this.state.currentMenu=', this.state.currentMenu);
+    switch(key) {
+      case 'delete':
+        this.deleteRows();
+        break;
+      default:
+        console.log('Не реализовано ');
+    }
   };
 
   render() {
     console.log("render - start");
+    console.log("state=", this.state);
     const { data, pagination, loading, selectedRowKeys} = this.state;
     const rowSelection = {
       selectedRowKeys,
