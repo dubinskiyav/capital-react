@@ -29,6 +29,7 @@ class Measure extends React.Component {
       current: 1,
       pageSize: 10,
     },
+    sorters: [{fieldName: "id", sortOrder: "ascend"}],
     selectedRowKeys: [], 
     loading: false,
     totalMax: 0, // Наибольшее количесвто выбранных записей
@@ -42,16 +43,20 @@ class Measure extends React.Component {
     console.log("componentDidMount - finish")
   }
   handleTableChange = (pagination, filters, sorter) => {
-    console.log("handleTableChange - start");
-    console.log("sorter.field=" + sorter.field);
-    console.log("sorter.order=" + sorter.order);
+    const { sorters } = this.state;
+    if (sorter.field) {
+      sorters = [
+        {
+          fieldName: sorter.field,
+          sortOrder: sorter.order
+        }
+      ];
+    }
     this.fetch({
-      sortField: sorter.field,
-      sortOrder: sorter.order,
+      sorters,
       pagination,
       ...filters,
     });
-    console.log("handleTableChange - finish");
   };
   fetch = (params = {}) => {
     console.log("fetch - start");
@@ -61,13 +66,13 @@ class Measure extends React.Component {
       pageSize: params.pagination.pageSize,
       sort: [{fieldName: "id"}]
     };
-    if (params.sortField) {
-      console.log("params.sortField=" + params.sortField);
-      gridDataOption.sort[0].fieldName = params.sortField;
-      if (params.sortOrder === "descend") {
+    // Из массива
+    if (params.sorters) {
+      gridDataOption.sort[0].fieldName = params.sorters[0].fieldName;
+      if (params.sorters[0].sortOrder === "descend") {
         gridDataOption.sort[0].direction = 1;
-        console.log("params.sortOrder=descend");
       }
+      this.setState({sorters:params.sorters} );
     }
     var total = (gridDataOption.pageNumber + 2) * gridDataOption.pageSize;
     if (total < this.state.totalMax) {
@@ -108,17 +113,40 @@ class Measure extends React.Component {
     const { selectedRowKeys } = this.state;
     let ids = selectedRowKeys.join(',');
     console.log('Deleting records ', ids, ' ...');
-
+    this.setState({ loading: true });
     reqwest({
       url: 'http://localhost:8080/measure/del/' + ids,
       contentType: "application/json; charset=utf-8",
       method: 'post',
       type: 'json',
     }).then((responseJson) => {
+      this.setState({
+        loading: false
+      });
+      console.log('responseJson=', responseJson);
+      const { errorCode } = responseJson;
+      if (errorCode) { // Ошибка
+        console.log('errorCode=', errorCode);
+      } else {
+        console.log('Удалили');
+        this.refreshData();
+        notification.success({
+          message:"Успешно",
+          description:"Удаление записей выполнено успешно"
+        });
+      }
+
       return;
     }).catch((error) => {
         throw (error);
     });
+  }
+
+  refreshData() {
+    // Перевыборка текущей страницы
+    console.log('refreshData');
+    const { pagination, sorters } = this.state;
+    this.fetch({pagination, sorters});
   }
 
   handleMenuClick = e => {
