@@ -2,11 +2,15 @@ import React from 'react';
 import 'antd/dist/antd.css';
 import './index.css';
 import './capital.css';
-import { Layout } from 'antd';
-import { Table, Button } from 'antd';
+import { Layout, Menu } from 'antd';
+import { Table } from 'antd';
 import reqwest from 'reqwest';
+import { PlusOutlined, EditOutlined, CloseOutlined, PrinterOutlined } from '@ant-design/icons';
+import Refresh from './icons/Refresh';
 
 const { Header, Content, Footer } = Layout;
+
+const { SubMenu } = Menu;
 
 // id не надо
 const columns = [
@@ -28,6 +32,7 @@ class Measure extends React.Component {
     selectedRowKeys: [], 
     loading: false,
     totalMax: 0, // Наибольшее количесвто выбранных записей
+    currentMenu: null, // Текущее меню
   };
   // размещаем побочные эффекты
   componentDidMount() {
@@ -99,6 +104,17 @@ class Measure extends React.Component {
     this.setState({ selectedRowKeys });
   };
 
+  handleMenuClick = e => {
+    console.log('click ', e);
+    const { key } = e;
+    this.setState({ currentMenu: key });
+    this.setState(function(key){
+      return {currentMenu: key}
+   });
+   this.setState({ currentMenu: 'aaa' });
+   console.log('this.state.currentMenu=', this.state.currentMenu);
+  };
+
   render() {
     console.log("render - start");
     const { data, pagination, loading, selectedRowKeys} = this.state;
@@ -107,11 +123,35 @@ class Measure extends React.Component {
       onChange: this.onSelectChange,
     };
     const hasSelected = selectedRowKeys.length > 0;
+    const { currentMenu } = this.state; // Текущее меню
     return (
       <div className="CapitalModule">
         <div className="Measure">
         <Layout>
-            <Header>Справочник мер измерения</Header>
+            <Header>
+            <div>
+                Справочник мер измерения
+            </div>
+            </Header>
+            <div>
+                <Menu onClick={this.handleMenuClick} selectedKeys={[currentMenu]} mode="horizontal">
+                  <SubMenu key="Command" title="Команды">
+                      <Menu.Item key="add" icon={<PlusOutlined />}>Добавить</Menu.Item>
+                      <Menu.Item key="edit" icon={<EditOutlined />}>Изменить</Menu.Item>
+                      <Menu.Item key="delete" icon={<CloseOutlined />}>Удалить</Menu.Item>
+                      <Menu.Item key="refresh" icon={<Refresh />}>Обновить</Menu.Item>
+                      <Menu.Item key="print" icon={<PrinterOutlined />}>Печать</Menu.Item>
+                  </SubMenu>
+                  <SubMenu key="Spravka" title="Справка">
+                    <Menu.Item key="help">Помощь</Menu.Item>
+                      <Menu.Item key="about">
+                        <a href="http://www.gelicon.biz/" target="_blank" rel="noopener noreferrer">
+                          О программе
+                        </a>
+                      </Menu.Item>
+                  </SubMenu>
+                </Menu>
+              </div>
             <Content>
               <div>
                 <Table 
@@ -121,6 +161,7 @@ class Measure extends React.Component {
                   pagination={pagination}
                   loading={loading}
                   onChange={this.handleTableChange}
+                  rowKey="id"
                 />
               </div>
             </Content>

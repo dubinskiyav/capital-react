@@ -111,6 +111,7 @@ class Unitmeasure extends React.Component {
                   pagination={pagination}
                   loading={loading}
                   onChange={this.handleTableChange}
+                  rowKey="id"
                 />
               </div>
             </Content>
