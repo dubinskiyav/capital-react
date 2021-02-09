@@ -192,20 +192,15 @@ class Measure extends React.Component {
         });
         break;
       case 'refresh':
-        notification.open({
-          message: 'Notification Title',
-          description:
-            'This is the content of the notification. This is the content of the notification. This is the content of the notification.',
-          icon: <SmileOutlined style={{ color: '#108ee9' }} />,
-        });
+        this.refreshData();
         break;
-        case 'print':
+      case 'print':
           notification.success({
             message:"Успешно",
             description:"Удаление записей выполнено успешно"
           });
             break;
-        default:
+      default:
         console.log('Не реализовано ');
     }
   };
