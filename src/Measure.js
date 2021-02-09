@@ -7,6 +7,8 @@ import { Table } from 'antd';
 import reqwest from 'reqwest';
 import { PlusOutlined, EditOutlined, CloseOutlined, PrinterOutlined } from '@ant-design/icons';
 import Refresh from './icons/Refresh';
+import { notification } from 'antd';
+import { SmileOutlined } from '@ant-design/icons';
 
 const { Header, Content, Footer } = Layout;
 
@@ -43,7 +45,7 @@ class Measure extends React.Component {
     console.log("componentDidMount - finish")
   }
   handleTableChange = (pagination, filters, sorter) => {
-    const { sorters } = this.state;
+    let { sorters } = this.state;
     if (sorter.field) {
       sorters = [
         {
@@ -127,18 +129,23 @@ class Measure extends React.Component {
       const { errorCode } = responseJson;
       if (errorCode) { // Ошибка
         console.log('errorCode=', errorCode);
-      } else {
-        console.log('Удалили');
-        this.refreshData();
-        notification.success({
-          message:"Успешно",
-          description:"Удаление записей выполнено успешно"
+        const { errorMessage, fieldErrors } = responseJson;
+        const description = errorMessage + fieldErrors.id;
+        notification.error({
+          message:"Ошибка при удалении записей",
+          description: ({description})
         });
+        } else {
+          console.log('Удалили');
+          this.refreshData();
+          notification.success({
+            message:"Успешно",
+            description:"Удаление записей выполнено успешно"
+          });
       }
-
       return;
     }).catch((error) => {
-        throw (error);
+      throw (error);
     });
   }
 
@@ -157,7 +164,21 @@ class Measure extends React.Component {
       case 'delete':
         this.deleteRows();
         break;
-      default:
+      case 'refresh':
+        notification.open({
+          message: 'Notification Title',
+          description:
+            'This is the content of the notification. This is the content of the notification. This is the content of the notification.',
+          icon: <SmileOutlined style={{ color: '#108ee9' }} />,
+        });
+        break;
+        case 'print':
+          notification.success({
+            message:"Успешно",
+            description:"Удаление записей выполнено успешно"
+          });
+            break;
+        default:
         console.log('Не реализовано ');
     }
   };
