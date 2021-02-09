@@ -2,13 +2,14 @@ import React from 'react';
 import 'antd/dist/antd.css';
 import './index.css';
 import './capital.css';
-import { Layout, Menu } from 'antd';
+import { Layout, Menu, Modal } from 'antd';
 import { Table } from 'antd';
 import reqwest from 'reqwest';
 import { PlusOutlined, EditOutlined, CloseOutlined, PrinterOutlined } from '@ant-design/icons';
 import Refresh from './icons/Refresh';
 import { notification } from 'antd';
 import { SmileOutlined } from '@ant-design/icons';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 
 const { Header, Content, Footer } = Layout;
 
@@ -113,6 +114,13 @@ class Measure extends React.Component {
 
   deleteRows() {
     const { selectedRowKeys } = this.state;
+    if (!(selectedRowKeys.length > 0)) {
+      notification.info({
+        message:"Нет записей для удаления",
+        description: "Отметьте одну или несколько записей для удаления"
+      });
+      return;
+    }
     let ids = selectedRowKeys.join(',');
     console.log('Deleting records ', ids, ' ...');
     this.setState({ loading: true });
@@ -133,14 +141,15 @@ class Measure extends React.Component {
         const description = errorMessage + fieldErrors.id;
         notification.error({
           message:"Ошибка при удалении записей",
-          description: ({description})
+          description: (description)
         });
         } else {
           console.log('Удалили');
           this.refreshData();
+          const description = "Удаление " + selectedRowKeys.length + " записей выполнено успешно";
           notification.success({
             message:"Успешно",
-            description:"Удаление записей выполнено успешно"
+            description: (description)
           });
       }
       return;
@@ -162,7 +171,25 @@ class Measure extends React.Component {
     this.setState({ currentMenu: key });
     switch(key) {
       case 'delete':
-        this.deleteRows();
+        const { selectedRowKeys } = this.state;
+        if (!(selectedRowKeys.length > 0)) {
+          notification.info({
+            message:"Нет записей для удаления",
+            description: "Отметьте одну или несколько записей для удаления"
+          });
+          return;
+        }
+        const content = "Вы действительно хотите удалить " + selectedRowKeys.length + " записей?";
+        Modal.confirm({
+          title: 'Подтверждение удаления',
+          icon: <ExclamationCircleOutlined />,
+          content: (content),
+          okText: 'Да, конечно!',
+          cancelText: 'Нет, я ошибся',
+          onOk:()=>{
+            this.deleteRows();
+          }
+        });
         break;
       case 'refresh':
         notification.open({
