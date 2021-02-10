@@ -172,7 +172,7 @@ const Measure = (props)=>{
   };
 
   // Перевыборка
-  const refreshData = useCallback(() => {
+  const refreshData = () => {
     // Перевыборка текущей страницы
     console.log('refreshData - start');
     setLoading(true);
@@ -207,17 +207,17 @@ const Measure = (props)=>{
       setSelectedRowKeys([]);
     });
     console.log('refreshData - finish');
-  }, [pagination, sorters, totalMax])
+  }
 
   // Эффект - первая выборка
   React.useEffect(() => {
     console.log("useEffect - start")
-    if(!data) {
-      setData([]); // важно, иначе начальный refresh выполняется несколько раз
+    if(!data) {      // важно, иначе начальный refresh выполняется несколько раз
+      setData([]); 
       refreshData();
     }
     console.log("useEffect - finish")
-  }, [data, refreshData]);
+  }); 
 
   return (
     <div className="CapitalModule">
