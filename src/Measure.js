@@ -10,6 +10,7 @@ import Refresh from './icons/Refresh';
 import { notification } from 'antd';
 import { SmileOutlined } from '@ant-design/icons';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
+import * as globalSettings from "./const";
 
 const { Header, Content, Footer } = Layout;
 
@@ -62,7 +63,7 @@ class Measure extends React.Component {
     });
   };
   fetch = (params = {}) => {
-    console.log("fetch - start");
+    console.log("fetch - start: " + globalSettings.startURL );
     this.setState({ loading: true });
     const gridDataOption = {
       pageNumber: params.pagination.current - 1,
@@ -81,11 +82,11 @@ class Measure extends React.Component {
     if (total < this.state.totalMax) {
       total = this.state.totalMax;
     } else {
-      this.state.totalMax = total;
+      this.setState({totalMax: total});
     }
     // ajax request after empty completing
     reqwest({
-      url: 'http://localhost:8080/measure/json',
+      url: globalSettings.startURL + "measure/json",
       contentType: "application/json; charset=utf-8",
       method: 'post',
       type: 'json',
@@ -125,7 +126,7 @@ class Measure extends React.Component {
     console.log('Deleting records ', ids, ' ...');
     this.setState({ loading: true });
     reqwest({
-      url: 'http://localhost:8080/measure/del/' + ids,
+      url: globalSettings.startURL + 'measure/del/' + ids,
       contentType: "application/json; charset=utf-8",
       method: 'post',
       type: 'json',
@@ -170,6 +171,19 @@ class Measure extends React.Component {
     const { key } = e;
     this.setState({ currentMenu: key });
     switch(key) {
+      case 'add':
+        console.log('add');
+        Modal.confirm({
+          title: 'Добавление меры измерения',
+          icon: <ExclamationCircleOutlined />,
+          content: "Добавление",
+          okText: 'Добавить',
+          cancelText: 'Отменить',
+          onOk:()=>{
+            console.log('add Ok');
+          }
+        });
+        break;
       case 'delete':
         const { selectedRowKeys } = this.state;
         if (!(selectedRowKeys.length > 0)) {
@@ -264,3 +278,5 @@ class Measure extends React.Component {
   }
 }
 export default Measure;
+
+// https://medium.com/@alef.duarte/using-ant-design-form-inside-a-modal-in-react-stateless-functional-component-634f33357c80
