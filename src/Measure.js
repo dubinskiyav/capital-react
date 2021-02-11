@@ -10,13 +10,13 @@ import Refresh from './icons/Refresh';
 import { notification } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import * as globalSettings from "./const";
-import { useCallback } from 'react';
 
 const { Header, Content, Footer } = Layout;
 
 const { SubMenu } = Menu;
 
-// id не надо
+// Описание столбцов
+// id не надо! - Его описать в key таблицы
 const columns = [
   {
     title: 'Наименование',
@@ -26,23 +26,29 @@ const columns = [
   },
 ];
 
-const Measure = (props)=>{
-  let [currentMenu, setCurrentMenu] = React.useState("null");
-  let [selectedRowKeys, setSelectedRowKeys] = React.useState([]);
-  let [data,setData] = React.useState(null);
-  let [loading,setLoading] = React.useState(false);
-  let [pagination,setPagination] = React.useState({
+/**
+ * Компонент для меры измерения
+ * @param {*} props 
+ */
+const Measure = ()=>{
+  let [currentMenu, setCurrentMenu] = React.useState("null"); // Текущее выбранное меню - непонятно зачем
+  let [selectedRowKeys, setSelectedRowKeys] = React.useState([]); // Отмеченные записи, изначально пустой
+  let [data,setData] = React.useState(null); // Основной массив данных - пустой сначала
+  let [loading,setLoading] = React.useState(false); // Момент загрузки данных для блокировки таблицы для действий
+  let [pagination,setPagination] = React.useState({ // Пагинация таблицы, нумерация с 1
     current: 1,
     pageSize: 10,
-    total: null,
+    total: null, // общее количество считанных записей
   });
-  let [sorters, setSorters] = React.useState([{
-    fieldName: "id", 
+  let [sorters, setSorters] = React.useState([{ // Массив сортировки, 
+    fieldName: "id",  // Изначально по id (без сортировки с пагинацией нельзя)
     sortOrder: "ascend"
   }]);
   let [totalMax, setTotalMax] = React.useState(0); // Наибольшее количесвто выбранных записей
 
-
+  /**
+   * Удаление записей
+   */
   const deleteRows = () => {
     if (!(selectedRowKeys.length > 0)) {
       notification.info({
@@ -53,7 +59,9 @@ const Measure = (props)=>{
     }
     let ids = selectedRowKeys.join(',');
     console.log('Deleting records ', ids, ' ...');
-    setLoading(true);
+    setLoading(true); // Блокируем отклики таблицы
+    // запрос к REST API на удаление записей
+    // globalSettings.startURL устанавливается в const.js
     reqwest({
       url: globalSettings.startURL + 'measure/del/' + ids,
       contentType: "application/json; charset=utf-8",
@@ -62,7 +70,7 @@ const Measure = (props)=>{
     }).then((responseJson) => {
       console.log('responseJson=', responseJson);
       const { errorCode } = responseJson;
-      if (errorCode) { // Ошибка
+      if (errorCode) { // Ошибка есть
         console.log('errorCode=', errorCode);
         const { errorMessage, fieldErrors } = responseJson;
         const description = errorMessage + fieldErrors.id;
@@ -70,8 +78,8 @@ const Measure = (props)=>{
           message:"Ошибка при удалении записей",
           description: (description)
         });
-        } else {
-          console.log('Удалили');
+        } else { // ошибки нет
+          console.log('Удалили ' + ids);
           refreshData();
           const description = "Удаление " + selectedRowKeys.length + " записей выполнено успешно";
           notification.success({
@@ -88,6 +96,10 @@ const Measure = (props)=>{
     setLoading(false);
   }
 
+  /**
+   * Обработчик нажатия меню
+   * @param {*} e 
+   */
   const handleMenuClick = e => {
     console.log('click ', e);
     const { key } = e;
@@ -141,23 +153,30 @@ const Measure = (props)=>{
     }
   };
 
-  console.log('Measure return');
-
+  /**
+   * Сохранение отметки записей
+   * @param {*} selectedRowKeysNew 
+   */
   const onSelectChange = selectedRowKeysNew => {
     setSelectedRowKeys( selectedRowKeysNew );
   };
 
+  /**
+   * Отмеченные записи 
+   */
   const rowSelection = {
     selectedRowKeys,
     onChange: onSelectChange,
   };
 
-  // При смене сортировки или страницы или фильтра
+  /**
+   * Обработчик смены параметров запроса из таблицы
+   * @param {*} paginationNew // При смене пагинации
+   * @param {*} filters // фильтра
+   * @param {*} sorter  // сортировки
+   */
   const handleTableChange = (paginationNew, filters, sorter) => {
     console.log('handleTableChange - start');
-    console.log('paginationNew.current=' + paginationNew.current);
-    console.log('pagination.current=' + pagination.current);
-    console.log('pagination.pageSize=' + pagination.pageSize);
     if (sorter.field) {
       sorters = [{
         fieldName: sorter.field, 
@@ -171,29 +190,32 @@ const Measure = (props)=>{
     console.log('handleTableChange - finish');
   };
 
-  // Перевыборка
+  /**
+   * Основная перевыборка данных
+   */
   const refreshData = () => {
-    // Перевыборка текущей страницы
     console.log('refreshData - start');
     setLoading(true);
     const gridDataOption = {
       pageNumber: pagination.current - 1,
       pageSize: pagination.pageSize,
-      sort: [{fieldName: "id"}]
+      sort: [{fieldName: "id"}] // Сортировка по умолчанию
     };
-    // Из массива
-    if (sorters) {
+    if (sorters) { // Сортировка установлена - переустановим
       gridDataOption.sort[0].fieldName = sorters[0].fieldName;
       if (sorters[0].sortOrder === "descend") {
         gridDataOption.sort[0].direction = 1;
       }
     }
+    console.log('gridDataOption=' + JSON.stringify(gridDataOption));
+    // Вычисляем total для таблицы
     let total = (gridDataOption.pageNumber + 2) * gridDataOption.pageSize;
     if (total < totalMax) {
       total = totalMax;
     } else {
       setTotalMax(total);
     }
+    // запрос к REST API на выборку
     reqwest({
       url: globalSettings.startURL + "measure/json",
       contentType: "application/json; charset=utf-8",
@@ -202,23 +224,28 @@ const Measure = (props)=>{
       data:JSON.stringify(gridDataOption)
     }).then(dataNew => {
       setLoading(false);
-      setData(dataNew);
-      setPagination({...pagination, total:  total});
-      setSelectedRowKeys([]);
+      setData(dataNew); // данные новые
+      setPagination({...pagination, total:  total}); // переустановим total у таблицы
+      setSelectedRowKeys([]); // обнулим отмеченные
     });
     console.log('refreshData - finish');
   }
 
-  // Эффект - первая выборка
+  /**
+   * Используем побочный эффект для первоначальной выборки 
+   */
   React.useEffect(() => {
-    console.log("useEffect - start")
-    if(!data) {      // важно, иначе начальный refresh выполняется несколько раз
-      setData([]); 
+    if(!data) {      // Делаем только если данных нет, иначе начальный refresh выполняется бесконечно
+      console.log("useEffect - initial refresh")
+      setData([]); // Непонятно зачем
       refreshData();
+      console.log("useEffect - initial refreshed")
     }
-    console.log("useEffect - finish")
   }); 
 
+  /**
+   * Возвращаем React компонент
+   */
   return (
     <div className="CapitalModule">
       <div className="Measure">
@@ -266,7 +293,6 @@ const Measure = (props)=>{
     </div>
   );
 }
-
 
 export default Measure;
 
