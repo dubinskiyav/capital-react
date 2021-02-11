@@ -2,7 +2,7 @@ import React from 'react';
 import 'antd/dist/antd.css';
 import './index.css';
 import './capital.css';
-import { Layout, Menu, Modal } from 'antd';
+import { Layout, Menu, Modal,Form } from 'antd';
 import { Table } from 'antd';
 import reqwest from 'reqwest';
 import { PlusOutlined, EditOutlined, CloseOutlined, PrinterOutlined } from '@ant-design/icons';
@@ -11,6 +11,13 @@ import { notification } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import * as globalSettings from "./const";
 import MeasureForm from "./MeasureForm";
+
+// URI для использования формой добавления/изменения
+const URI_ROOT = "measure"
+const URI_SELECT = URI_ROOT + "/json"
+const URI_ADD = URI_ROOT + "/add"
+const URI_UPD = URI_ROOT + "/upd"
+const URI_POST = URI_ROOT + "/post"
 
 
 const { Header, Content, Footer } = Layout;
@@ -49,6 +56,12 @@ const Measure = ()=>{
   let [totalMax, setTotalMax] = React.useState(0); // Наибольшее количесвто выбранных записей
 
   let [formVisible,setFormVisible] = React.useState(false); // Видимость формы ввода
+  let [editorContext] = React.useState({ // Данные для формы добавления-изменения
+    uriForAdd: URI_ADD,
+    uriForUpd: URI_UPD,
+    uriForPost: URI_POST,
+  });
+  const [form] = Form.useForm();
 
   /**
    * Удаление записей
@@ -105,6 +118,12 @@ const Measure = ()=>{
    * @param {*} id 
    */
   const callForm = (id) => {
+    console.log('calForm - id=' + id);
+    if (form.getFieldValue) {
+      form.resetFields();
+      console.log('form.resetFields');
+    }
+    editorContext.id = id;
     setFormVisible(true); // Видимость формы
   }
 
@@ -121,18 +140,6 @@ const Measure = ()=>{
       case 'add':
         console.log('add');
         callForm(); // Вызовем форму без установленного параметра id
-        if (false) {
-          Modal.confirm({
-            title: 'Добавление меры измерения',
-            icon: <ExclamationCircleOutlined />,
-            content: "Добавление",
-            okText: 'Добавить',
-            cancelText: 'Отменить',
-            onOk:()=>{
-              console.log('add Ok');
-            }
-          });
-        }
         break;
       case 'delete':
         if (!(selectedRowKeys.length > 0)) {
@@ -300,6 +307,10 @@ const Measure = ()=>{
           <Content>
             <div>
               <Table 
+                className="mod-main-table" 
+                rowClassName="table-editable-row"  
+                bordered 
+                size={"middle"}
                 loading={loading}
                 rowSelection={rowSelection} 
                 columns={columns} 
@@ -307,10 +318,17 @@ const Measure = ()=>{
                 pagination={pagination}
                 onChange={handleTableChange}
                 rowKey="id"
+                onRow={(record, rowIndex) => {
+                  return {
+                    onClick: event => callForm(record.id)
+                  };
+                }}
               />
             </div>
             <MeasureForm 
+              form={form}
               visible={formVisible}
+              editorContext={editorContext}
               afterCancel = {() => {
                 setFormVisible(false);
               }}

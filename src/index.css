@@ -33,18 +33,30 @@ body { /* Именно так, без точки */
     min-height: 280px;
     padding: 24px;
     background: #fff;
-  }
-  .logo {
-    float: left;
-    width: 120px;
-    height: 31px;
-    margin: 16px 24px 16px 0;
-    background: rgba(255, 255, 255, 0.3);
-  }
-  .ant-row-rtl .logo {
-    float: right;
-    margin: 16px 0 16px 24px;
-  }
-    [data-theme="dark"] .site-layout-content {
-      background: #141414;
-    }
+}
+.logo {
+  float: left;
+  width: 120px;
+  height: 31px;
+  margin: 16px 24px 16px 0;
+  background: rgba(255, 255, 255, 0.3);
+}
+.ant-row-rtl .logo {
+  float: right;
+  margin: 16px 0 16px 24px;
+}
+[data-theme="dark"] .site-layout-content {
+    background: #141414;
+}
+
+.mod-main-table {
+  height1: calc(100% - 50px);
+}
+
+.table-editable-row {
+  cursor: pointer;
+}
+
+.ant-table-tbody > tr.ant-table-row:hover > td {
+  background:#B7D4FF !important;
+}
