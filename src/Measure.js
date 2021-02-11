@@ -10,6 +10,8 @@ import Refresh from './icons/Refresh';
 import { notification } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import * as globalSettings from "./const";
+import MeasureForm from "./MeasureForm";
+
 
 const { Header, Content, Footer } = Layout;
 
@@ -45,6 +47,8 @@ const Measure = ()=>{
     sortOrder: "ascend"
   }]);
   let [totalMax, setTotalMax] = React.useState(0); // Наибольшее количесвто выбранных записей
+
+  let [formVisible,setFormVisible] = React.useState(false); // Видимость формы ввода
 
   /**
    * Удаление записей
@@ -97,6 +101,14 @@ const Measure = ()=>{
   }
 
   /**
+   * Вызов формы добавления-изменения
+   * @param {*} id 
+   */
+  const callForm = (id) => {
+    setFormVisible(true); // Видимость формы
+  }
+
+  /**
    * Обработчик нажатия меню
    * @param {*} e 
    */
@@ -108,16 +120,19 @@ const Measure = ()=>{
     switch(key) {
       case 'add':
         console.log('add');
-        Modal.confirm({
-          title: 'Добавление меры измерения',
-          icon: <ExclamationCircleOutlined />,
-          content: "Добавление",
-          okText: 'Добавить',
-          cancelText: 'Отменить',
-          onOk:()=>{
-            console.log('add Ok');
-          }
-        });
+        callForm(); // Вызовем форму без установленного параметра id
+        if (false) {
+          Modal.confirm({
+            title: 'Добавление меры измерения',
+            icon: <ExclamationCircleOutlined />,
+            content: "Добавление",
+            okText: 'Добавить',
+            cancelText: 'Отменить',
+            onOk:()=>{
+              console.log('add Ok');
+            }
+          });
+        }
         break;
       case 'delete':
         if (!(selectedRowKeys.length > 0)) {
@@ -294,6 +309,17 @@ const Measure = ()=>{
                 rowKey="id"
               />
             </div>
+            <MeasureForm 
+              visible={formVisible}
+              afterCancel = {() => {
+                setFormVisible(false);
+              }}
+              afterSave={()=>{
+                setFormVisible(false);
+                refreshData();
+              }}
+            >
+            </MeasureForm>
           </Content>
           <Footer>Низ Капитал</Footer>
         </Layout>
