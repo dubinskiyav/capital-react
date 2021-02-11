@@ -222,12 +222,22 @@ const Measure = ()=>{
       method: 'post',
       type: 'json',
       data:JSON.stringify(gridDataOption)
-    }).then(dataNew => {
-      setLoading(false);
-      setData(dataNew); // данные новые
-      setPagination({...pagination, total:  total}); // переустановим total у таблицы
-      setSelectedRowKeys([]); // обнулим отмеченные
-    });
+    })
+      .then(dataNew => {
+        setData(dataNew); // данные новые
+        setPagination({...pagination, total:  total}); // переустановим total у таблицы
+        setSelectedRowKeys([]); // обнулим отмеченные
+      },
+      // todo Сделать обработку ошибок
+      (error) => {
+        notification.error({
+          message:"Ошибка при выборке за пределами программы",
+          description: "error"
+        });
+        console.log('refreshData - error=' + error);
+      }
+    );
+    setLoading(false);
     console.log('refreshData - finish');
   }
 
