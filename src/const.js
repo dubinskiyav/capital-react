@@ -1,2 +1,1 @@
-const startURL = "http://localhost:8080/";
-export { startURL };
+export const startURL = "http://localhost:8080/";

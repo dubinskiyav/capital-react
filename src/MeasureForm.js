@@ -4,6 +4,9 @@ import { Form, Input } from 'antd';
 import reqwest from 'reqwest';
 import { notification } from 'antd';
 
+const titleAdd = "Добавление меры измерения";
+const titleUpd = "Изменение меры измерения";
+
 /**
  * Добавление-изменение меры измерения
  * @param {*} props 
@@ -21,7 +24,7 @@ const MeasureForm = (props)=>{
         if(props.editorContext.id && props.editorContext.id !== 0) {
             console.log("Load for edit id = ",props.editorContext.id);
             console.log("uriForUpd = ",props.editorContext.uriForUpd);
-            // запрос к REST API на выборку
+            // запрос к REST API на выборку по id
             reqwest({
                 url: props.editorContext.uriForUpd + '/' + props.editorContext.id,
                 contentType: "application/json; charset=utf-8",
@@ -30,7 +33,7 @@ const MeasureForm = (props)=>{
             }).then(record => {
                     console.log("record = " + JSON.stringify(record));
                     setData(record); // данные новые
-                    form.resetFields();
+                    //form.resetFields(); // Перенесено в useEffect
                 },
                 // todo Сделать обработку ошибок
                 (error) => {
@@ -43,9 +46,24 @@ const MeasureForm = (props)=>{
             );
         } else {
             console.log("Load for add");
-            //form.resetFields();
-            //setData({});
-            //setData(null);
+            // запрос к REST API на выборку для начального значения
+            reqwest({
+                url: props.editorContext.uriForAdd,
+                contentType: "application/json; charset=utf-8",
+                method: 'get',
+                type: 'json',
+            }).then(record => {
+                    console.log("record = " + JSON.stringify(record));
+                    setData(record); // данные новые
+                },
+                (error) => {
+                notification.error({
+                    message:"Ошибка при выборке за пределами программы",
+                    description: "error"
+                });
+                console.log('refreshData - error=' + error);
+                }
+            );
         }
     }
    
@@ -56,7 +74,8 @@ const MeasureForm = (props)=>{
     // Побочный эффект для первоначального фокуса
     React.useEffect(()=>{
         if (props.visible) { // Обязательно, если видимость, иначе свалится
-           // form = props.form;
+            form.resetFields(); // Для того, чтобы поля перерисовались со значениями
+            // form = props.form;
             setTimeout(() => { // На всякий случай таймаут
                 firstInputRef.current.focus({cursor: 'end',});
             }, 100);
@@ -68,9 +87,50 @@ const MeasureForm = (props)=>{
         form.resetFields();
     }
 
+    //Сохранение
+    const save=(values,after)=>{
+        const record = { // сцепим id и vslues в один объект
+            "id": props.editorContext.id,
+            ...values
+        }
+        console.log("Saving record = ",JSON.stringify(record));
+        // запрос к REST API на выборку
+        reqwest({
+            url: props.editorContext.uriForPost,
+            contentType: "application/json; charset=utf-8",
+            method: 'post',
+            type: 'json',
+            data:JSON.stringify(record)
+        }).then((responseJson) => {
+            console.log('responseJson=', responseJson);
+            const { errorCode } = responseJson;
+            if (errorCode) { // Ошибка есть
+              console.log('errorCode=', errorCode);
+              const { errorMessage, fieldErrors } = responseJson;
+              const description = errorMessage + fieldErrors.id;
+              notification.error({
+                message:"Ошибка при сохранении записей",
+                description: (description)
+              });
+              } else { // ошибки нет
+                after(); // Сюда передали refreshData
+                let description = "Запись добавлена";
+                if (props.editorContext.id) {
+                    description = "Запись изменена";
+                }
+                notification.success({
+                  message:"Успешно",
+                  description: (description)
+                });
+            }
+        })
+    }
+    
+
     return <Modal
         visible={props.visible}
         title="Новая запись"
+        title={ props.editorContext.id ? titleUpd : titleAdd }
         okText="Согласен"
         cancelText="Отмена"
         onCancel={()=>{
@@ -78,9 +138,21 @@ const MeasureForm = (props)=>{
             setData(null);
         }}
         onOk={() => {
-            props.afterSave();
-            setData(null);
-        }}
+            props.form.validateFields().then((values) => {
+                    save(values,()=>{
+                        props.afterSave(values);
+                        setData(null);
+                    });
+                })
+                .catch((info) => {
+                    console.log('Validate Failed:', info);
+                    notification.error({
+                        message: 'Ошибка ввода',
+                        description: 'Проверьте правильность ввода всех полей'
+                    });
+                });
+            }
+        }
         >
         <Form
             form={form}
