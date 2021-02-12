@@ -13,10 +13,10 @@ import * as globalSettings from "./const";
 import MeasureForm from "./MeasureForm";
 
 // URI для использования формой добавления/изменения
-const URI_ROOT = "measure"
+const URI_ROOT = globalSettings.startURL + "measure"
 const URI_SELECT = URI_ROOT + "/json"
 const URI_ADD = URI_ROOT + "/add"
-const URI_UPD = URI_ROOT + "/upd"
+const URI_UPD = URI_ROOT + "/upd" // для выборки записи по id
 const URI_POST = URI_ROOT + "/post"
 
 
@@ -61,7 +61,7 @@ const Measure = ()=>{
     uriForUpd: URI_UPD,
     uriForPost: URI_POST,
   });
-  const [form] = Form.useForm();
+  const [form] = Form.useForm(); // для эффекта
 
   /**
    * Удаление записей
@@ -118,11 +118,7 @@ const Measure = ()=>{
    * @param {*} id 
    */
   const callForm = (id) => {
-    console.log('calForm - id=' + id);
-    if (form.getFieldValue) {
-      form.resetFields();
-      console.log('form.resetFields');
-    }
+    console.log('calForm - id = ' + id);
     editorContext.id = id;
     setFormVisible(true); // Видимость формы
   }

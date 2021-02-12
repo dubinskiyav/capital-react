@@ -1,6 +1,8 @@
 import React from 'react';
 import {Modal} from 'antd';
 import { Form, Input } from 'antd';
+import reqwest from 'reqwest';
+import { notification } from 'antd';
 
 /**
  * Добавление-изменение меры измерения
@@ -9,24 +11,41 @@ import { Form, Input } from 'antd';
 const MeasureForm = (props)=>{
     const firstInputRef = React.useRef(null); // Создаем реф для первоначального фокуса
     let [data,setData] = React.useState(null); // Запись для редактирования
-    const [form] = Form.useForm();
+    let form = props.form; // Форма из параметра для эффекта
 
     /**
      * Загрузка данных из id
      */
     const load = ()=>{
-        if(props.editorContext.id && props.editorContext.id != 0) {
-            console.log("Load fo edit id=",props.editorContext.id);
-            // Получим запись по id
-            const record = {
-                id: props.editorContext.id,
-                name: "fsdvfdsvdfsv",
-            };
-            setData(record);
+        console.log("Load with props.editorContext.id=" + props.editorContext.id);
+        if(props.editorContext.id && props.editorContext.id !== 0) {
+            console.log("Load for edit id = ",props.editorContext.id);
+            console.log("uriForUpd = ",props.editorContext.uriForUpd);
+            // запрос к REST API на выборку
+            reqwest({
+                url: props.editorContext.uriForUpd + '/' + props.editorContext.id,
+                contentType: "application/json; charset=utf-8",
+                method: 'get',
+                type: 'json',
+            }).then(record => {
+                    console.log("record = " + JSON.stringify(record));
+                    setData(record); // данные новые
+                    form.resetFields();
+                },
+                // todo Сделать обработку ошибок
+                (error) => {
+                notification.error({
+                    message:"Ошибка при выборке за пределами программы",
+                    description: "error"
+                });
+                console.log('refreshData - error=' + error);
+                }
+            );
         } else {
-            console.log("Load fo add");
-            form.resetFields();
-            setData({})
+            console.log("Load for add");
+            //form.resetFields();
+            //setData({});
+            //setData(null);
         }
     }
    
@@ -37,6 +56,7 @@ const MeasureForm = (props)=>{
     // Побочный эффект для первоначального фокуса
     React.useEffect(()=>{
         if (props.visible) { // Обязательно, если видимость, иначе свалится
+           // form = props.form;
             setTimeout(() => { // На всякий случай таймаут
                 firstInputRef.current.focus({cursor: 'end',});
             }, 100);
@@ -44,7 +64,7 @@ const MeasureForm = (props)=>{
     })
 
     function handleClick() {
-        console.log("form.resetFields();");
+        console.log("handleClick - form.resetFields();");
         form.resetFields();
     }
 
@@ -55,9 +75,11 @@ const MeasureForm = (props)=>{
         cancelText="Отмена"
         onCancel={()=>{
             props.afterCancel();
+            setData(null);
         }}
         onOk={() => {
             props.afterSave();
+            setData(null);
         }}
         >
         <Form
