@@ -1,7 +1,7 @@
 import React from 'react';
 import 'antd/dist/antd.css';
-import './index.css';
-import './capital.css';
+import '../../resources/css/index.css';
+import '../../resources/css/capital.css';
 import { Layout, Menu, Breadcrumb } from 'antd';
 
 const { Header, Content, Footer } = Layout;

@@ -1,7 +1,7 @@
 import React from 'react';
-import Measure from './Measure';
-import Unitmeasure from './Unitmeasure';
-import Material from './Material';
+import Measure from './modules/measure/Measure';
+import Unitmeasure from './modules/unitmeasure/Unitmeasure';
+import Material from './modules/material/Material';
 class CapitalModule extends React.Component {
   constructor(props) {
     super(props);

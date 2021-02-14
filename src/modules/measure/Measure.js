@@ -1,21 +1,22 @@
 import React from 'react';
 import 'antd/dist/antd.css';
-import './index.css';
-import './capital.css';
+import '../../resources/css/index.css';
+import '../../resources/css/capital.css';
 import { Layout, Menu, Modal,Form } from 'antd';
 import { Table } from 'antd';
 import reqwest from 'reqwest';
 import { PlusOutlined, EditOutlined, CloseOutlined, PrinterOutlined } from '@ant-design/icons';
-import Refresh from './icons/Refresh';
+import Refresh from '../../icons/Refresh';
 import { notification } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import * as globalSettings from "./const";
+import * as globalSettings from "../../lib/const";
 import MeasureForm from "./MeasureForm";
 
 
 // URI для использования формой добавления/изменения
 const URI_ROOT = globalSettings.startURL + "measure"
 const URI_SELECT = URI_ROOT + "/json"
+const URI_DEL = URI_ROOT + "/del"
 const URI_ADD = URI_ROOT + "/add"
 const URI_UPD = URI_ROOT + "/upd" // для выборки записи по id
 const URI_POST = URI_ROOT + "/post"
@@ -81,7 +82,7 @@ const Measure = ()=>{
     // запрос к REST API на удаление записей
     // globalSettings.startURL устанавливается в const.js
     reqwest({
-      url: globalSettings.startURL + 'measure/del/' + ids,
+      url: URI_DEL + '/' + ids,
       contentType: "application/json; charset=utf-8",
       method: 'post',
       type: 'json',
@@ -236,7 +237,7 @@ const Measure = ()=>{
     }
     // запрос к REST API на выборку
     reqwest({
-      url: globalSettings.startURL + "measure/json",
+      url: URI_SELECT,
       contentType: "application/json; charset=utf-8",
       method: 'post',
       type: 'json',
