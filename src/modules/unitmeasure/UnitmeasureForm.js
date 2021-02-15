@@ -129,7 +129,6 @@ const UnitmeasureForm = (props)=>{
 
     return <Modal
         visible={props.visible}
-        title="Новая запись"
         title={ props.editorContext.id ? titleUpd : titleAdd }
         okText="Согласен"
         cancelText="Отмена"

@@ -31,38 +31,40 @@ const columns = [
   {
     title: 'Наименование',
     dataIndex: 'name',
-    sorter: true,
-    width: '20%',
+    sorter: {
+      multiple: 1,
+    },
   },
   {
     title: 'Сокращение',
     dataIndex: 'shortName',
-    sorter: true,
-    width: '10%',
+    key: 'short_name', // Возможно это название поля в базе
+    sorter: {
+      multiple: 2,
+    },
   },
   {
     title: 'measureunitId',
     dataIndex: 'measureunitId',
     sorter: false,
-    width: '10%',
   },
   {
     title: 'Приоритет',
     dataIndex: 'priority',
-    sorter: true,
-    width: '10%',
+    sorter: {
+      multiple: 3,
+    },
   },
   {
     title: 'measureId',
     dataIndex: 'measureId',
-    sorter: true,
-    width: '10%',
   },
   {
     title: 'Мера измерения',
     dataIndex: 'measureName',
-    sorter: true,
-    width: '10%',
+    sorter: {
+      multiple: 4,
+    },
   },
 ];
 
@@ -77,7 +79,7 @@ const Unitmeasure = ()=>{
   let [loading,setLoading] = React.useState(false); // Момент загрузки данных для блокировки таблицы для действий
   let [pagination,setPagination] = React.useState({ // Пагинация таблицы, нумерация с 1
     current: 1,
-    pageSize: 10,
+    pageSize: 5,
     total: null, // общее количество считанных записей
   });
   let [sorters, setSorters] = React.useState([{ // Массив сортировки, 
@@ -224,15 +226,29 @@ const Unitmeasure = ()=>{
    * @param {*} filters // фильтра
    * @param {*} sorter  // сортировки
    */
-  const handleTableChange = (paginationNew, filters, sorter) => {
+  const handleTableChange = (paginationNew, filters, sorter, extra) => {
     console.log('handleTableChange - start');
-    if (sorter.field) {
+    console.log('params', paginationNew, filters, sorter, extra);
+
+    if (sorter.field) { // Установлена единичкая сортировка
       sorters = [{
         fieldName: sorter.field, 
         sortOrder: sorter.order
       }];
       setSorters(sorters);
-    }  
+    } else { // Возможно, установлена множественная сортировка
+      console.log('sorter.length = ', sorter.length);
+      sorters = [];
+      Object.keys(sorter).forEach(element => {
+        console.log("sorter[element].fieldName = " + sorter[element].fieldName);
+        if (sorter[element].field)
+          sorters.push({
+            fieldName: sorter[element].field,
+            sortOrder: sorter[element].order,
+          });
+      });
+    }
+    console.log('sorters = ' + JSON.stringify(sorters));
     pagination = paginationNew;
     setPagination(pagination);
     refreshData();
@@ -245,24 +261,36 @@ const Unitmeasure = ()=>{
   const refreshData = () => {
     console.log('refreshData - start');
     setLoading(true);
-    const gridDataOption = {
+    let gridDataOption = {
       pageNumber: pagination.current - 1,
       pageSize: pagination.pageSize,
       sort: [{fieldName: "id"}] // Сортировка по умолчанию
     };
     if (sorters) { // Сортировка установлена - переустановим
-      gridDataOption.sort[0].fieldName = sorters[0].fieldName;
-      if (sorters[0].sortOrder === "descend") {
-        gridDataOption.sort[0].direction = 1;
-      }
+      gridDataOption.sort = [];
+      sorters.forEach(element => {
+        let sortOrder = 0;
+        if (element.order === "descend") {
+          sortOrder = 1;
+        }
+          gridDataOption.sort.push({
+          fieldName: element.field,
+          sortOrder: sortOrder,
+        });
+      });
     }
     console.log('gridDataOption=' + JSON.stringify(gridDataOption));
     // Вычисляем total для таблицы
     let total = (gridDataOption.pageNumber + 2) * gridDataOption.pageSize;
+    console.log('total 1 = ' + total);
+
     if (total < totalMax) {
       total = totalMax;
+      console.log('total 2 = ' + total);
     } else {
+      totalMax = total;
       setTotalMax(total);
+      console.log('total 3 = ' + total);
     }
     // запрос к REST API на выборку
     reqwest({
@@ -307,7 +335,7 @@ const Unitmeasure = ()=>{
    */
   return (
     <div className="CapitalModule">
-      <div className="Measure">
+      <div className="Unitmeasure">
       <Layout>
           <Header>
             Список мер измерения
@@ -352,7 +380,7 @@ const Unitmeasure = ()=>{
                 }}
               />
             </div>
-            <MeasureForm 
+            <UnitmeasureForm 
               form={form}
               visible={formVisible}
               editorContext={editorContext}
@@ -364,7 +392,7 @@ const Unitmeasure = ()=>{
                 refreshData();
               }}
             >
-            </MeasureForm>
+            </UnitmeasureForm>
           </Content>
           <Footer>Низ Капитал</Footer>
         </Layout>
@@ -373,6 +401,6 @@ const Unitmeasure = ()=>{
   );
 }
 
-export default Measure;
+export default Unitmeasure;
 
 // https://medium.com/@alef.duarte/using-ant-design-form-inside-a-modal-in-react-stateless-functional-component-634f33357c80
