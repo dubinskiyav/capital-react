@@ -281,7 +281,7 @@ const Measure = ()=>{
       <div className="Measure">
       <Layout>
           <Header>
-            Справочник мер измерения
+            Список мер измерения
           </Header>
             <div>
               <Menu onClick={handleMenuClick} selectedKeys={[currentMenu]} mode="horizontal">
