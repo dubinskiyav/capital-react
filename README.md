@@ -1,3 +1,66 @@
+1. Установить git
+2. Установить OpenJDK   sudo apt-get install default-jdk
+3. Установить https://nodejs.org/en/
+   sudo apt update
+   sudo apt upgrade
+   sudo apt install nodejs
+   установить npm, диспетчер пакетов Node.js
+    sudo apt install npm
+4. полезное видео https://www.youtube.com/watch?v=riRrKFkbS-g&ab_channel=WebDeveloperBlog
+5 Установить React глобально на компьютере
+      sudo npm install -g create-react-app
+6. Установить https://code.visualstudio.com/
+7. Установить пакеты расширений для него https://marketplace.visualstudio.com/items?itemName=waderyan.nodejs-extension-pack
+   Babel JavaScript  https://marketplace.visualstudio.com/items?itemName=mgmcdermott.vscode-language-babel
+8. Создаеть пустой проект
+     npx create-react-app my-app
+     cd my-app
+     npm start
+
+9. Клонировать мой проект (в заранее созданной папке)
+     git clone https://github.com/dubinskiyav/capital-react.git
+
+10. Зайти в папку capital-react и установить компоненты:
+       https://ant.design/docs/react/introduce
+        npm install antd
+
+       все что ставим пакетным менеджером npm ставится в каталог node_modules.  Рядом с ним есть файл package.json в котором список пакетов, которые мы инсталлировали
+11. Установить пакет request
+        npm install reqwest
+12. Пакет CORS
+       https://coderlessons.com/tutorials/java-tekhnologii/learn-spring-boot/spring-boot-podderzhka-cors#:~:text=Cross%2DOrigin%20Resource%20Sharing%20(CORS,%D0%BA%D0%BE%D0%B4%D0%B0%20JavaScript%20%D0%B7%D0%B0%D0%BF%D1%80%D0%BE%D1%81%D0%BE%D0%B2%20%D1%80%D0%B0%D0%B7%D0%BB%D0%B8%D1%87%D0%BD%D0%BE%D0%B3%D0%BE%20%D0%BF%D1%80%D0%BE%D0%B8%D1%81%D1%85%D0%BE%D0%B6%D0%B4%D0%B5%D0%BD%D0%B8%D1%8F. 
+
+     npm install cors
+
+13. notifications:
+      https://www.npmjs.com/package/react-notifications
+       npm install --save react-notifications
+
+14. Навигация
+         https://www.npmjs.com/package/react-breadcrumbs-dynamic
+          npm install --save react-through react-breadcrumbs-dynamic
+          npm install --save react-router-dom
+
+15. Зайти в папку 
+     capital-react\node_modules\react-scripts\config\
+     найти файл webpackDevServer.config.js
+    и в конец встаить
+    headers:{
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST, GET, OPTIONS'
+    }
+   вставить на одном уровне с after(app) {
+  после должно быть две закрыв фигурные скобки с точками с запятой
+       
+16. Зайти в папку capital-react и выполнить
+       npm start
+
+      запустится браузер и перенйдет на страницу localhost:3000 где можно будет увидеть зачатки программы
+	  
+	  
+	  
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
