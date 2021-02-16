@@ -44,11 +44,6 @@ const columns = [
     },
   },
   {
-    title: 'measureunitId',
-    dataIndex: 'measureunitId',
-    sorter: false,
-  },
-  {
     title: 'Приоритет',
     dataIndex: 'priority',
     sorter: {
@@ -56,16 +51,24 @@ const columns = [
     },
   },
   {
-    title: 'measureId',
-    dataIndex: 'measureId',
-  },
-  {
     title: 'Мера измерения',
     dataIndex: 'measureName',
     sorter: {
       multiple: 4,
     },
-  },
+    // todo сделать динамическое формирование
+    filters: [ 
+      { text: 'Без меры измерения',       value:'Без меры измерения' },
+      { text: 'Расстояние',               value: 'Расстояние' },
+      { text: 'Вес',                      value: 'Вес' },
+      { text: 'Время',                    value: 'Время' },
+      { text: 'Сила электрического тока', value: 'Сила электрического тока' },
+      { text: 'Температура',              value: 'Температура' },
+      { text: 'Количество вечества',      value: 'Количество вечества' },
+      { text: 'Сила света',               value: 'Сила света' },
+    ],
+    onFilter: (value, record) => record.measureName.includes(value),
+},
 ];
 
 /**
@@ -79,7 +82,7 @@ const Unitmeasure = ()=>{
   let [loading,setLoading] = React.useState(false); // Момент загрузки данных для блокировки таблицы для действий
   let [pagination,setPagination] = React.useState({ // Пагинация таблицы, нумерация с 1
     current: 1,
-    pageSize: 5,
+    pageSize: 10,
     total: null, // общее количество считанных записей
   });
   let [sorters, setSorters] = React.useState([{ // Массив сортировки, 
@@ -95,6 +98,8 @@ const Unitmeasure = ()=>{
     uriForPost: URI_POST,
   });
   const [form] = Form.useForm(); // для эффекта
+  let [filteredInfo, setFilteredInfo] = React.useState(0); // Фильтр
+
 
   /**
    * Удаление записей
@@ -245,8 +250,15 @@ const Unitmeasure = ()=>{
     }
     pagination = paginationNew;
     setPagination(pagination);
+    console.log('filters = ' + JSON.stringify(filters));
+    setFilteredInfo(filters); // Установим переданный в параметрах фильтр
     refreshData();
   };
+
+  const clearFilters = () => { // Обнуление фильтра
+    setFilteredInfo(null); 
+  };
+
 
   /**
    * Основная перевыборка данных
@@ -283,6 +295,9 @@ const Unitmeasure = ()=>{
       setTotalMax(total);
     }
     console.log('total = ' + total);
+    // Фильтрация
+    filteredInfo = filteredInfo || {};
+    console.log('filteredInfo = ' + JSON.stringify(filteredInfo));
     // запрос к REST API на выборку
     reqwest({
       url: URI_SELECT,
@@ -329,7 +344,7 @@ const Unitmeasure = ()=>{
       <div className="Unitmeasure">
       <Layout>
           <Header>
-            Список мер измерения
+            Список единиц измерения
           </Header>
             <div>
               <Menu onClick={handleMenuClick} selectedKeys={[currentMenu]} mode="horizontal">
