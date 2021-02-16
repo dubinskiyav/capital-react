@@ -227,9 +227,6 @@ const Unitmeasure = ()=>{
    * @param {*} sorter  // сортировки
    */
   const handleTableChange = (paginationNew, filters, sorter, extra) => {
-    console.log('handleTableChange - start');
-    console.log('params', paginationNew, filters, sorter, extra);
-
     if (sorter.field) { // Установлена единичкая сортировка
       sorters = [{
         fieldName: sorter.field, 
@@ -237,10 +234,8 @@ const Unitmeasure = ()=>{
       }];
       setSorters(sorters);
     } else { // Возможно, установлена множественная сортировка
-      console.log('sorter.length = ', sorter.length);
       sorters = [];
       Object.keys(sorter).forEach(element => {
-        console.log("sorter[element].fieldName = " + sorter[element].fieldName);
         if (sorter[element].field)
           sorters.push({
             fieldName: sorter[element].field,
@@ -248,50 +243,46 @@ const Unitmeasure = ()=>{
           });
       });
     }
-    console.log('sorters = ' + JSON.stringify(sorters));
     pagination = paginationNew;
     setPagination(pagination);
     refreshData();
-    console.log('handleTableChange - finish');
   };
 
   /**
    * Основная перевыборка данных
    */
   const refreshData = () => {
-    console.log('refreshData - start');
     setLoading(true);
     let gridDataOption = {
       pageNumber: pagination.current - 1,
       pageSize: pagination.pageSize,
-      sort: [{fieldName: "id"}] // Сортировка по умолчанию
+      sort: [{fieldName: "id", direction: 0}] // Сортировка по умолчанию
     };
     if (sorters) { // Сортировка установлена - переустановим
-      gridDataOption.sort = [];
+      console.log('sorters = ' + JSON.stringify(sorters));
+      let sort = []; 
       sorters.forEach(element => {
-        let sortOrder = 0;
-        if (element.order === "descend") {
-          sortOrder = 1;
+        let direction = 0;
+        if (element.sortOrder === "descend") {
+          direction = 1;
         }
-          gridDataOption.sort.push({
-          fieldName: element.field,
-          sortOrder: sortOrder,
-        });
+        sort.push({
+          fieldName: element.fieldName,
+          direction: direction,
+        });      
       });
+      gridDataOption.sort = sort;
     }
     console.log('gridDataOption=' + JSON.stringify(gridDataOption));
     // Вычисляем total для таблицы
     let total = (gridDataOption.pageNumber + 2) * gridDataOption.pageSize;
-    console.log('total 1 = ' + total);
-
     if (total < totalMax) {
       total = totalMax;
-      console.log('total 2 = ' + total);
     } else {
       totalMax = total;
       setTotalMax(total);
-      console.log('total 3 = ' + total);
     }
+    console.log('total = ' + total);
     // запрос к REST API на выборку
     reqwest({
       url: URI_SELECT,
