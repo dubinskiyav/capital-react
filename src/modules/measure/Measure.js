@@ -31,11 +31,13 @@ const { SubMenu } = Menu;
 const columns = [
   {
     title: 'Наименование',
-    dataIndex: 'name',
+    dataIndex: 'measureName',
     sorter: true,
     width1: '20%',
   },
 ];
+
+const idName = "measureId";
 
 /**
  * Компонент для меры измерения
@@ -52,7 +54,7 @@ const Measure = ()=>{
     total: null, // общее количество считанных записей
   });
   let [sorters, setSorters] = React.useState([{ // Массив сортировки, 
-    fieldName: "id",  // Изначально по id (без сортировки с пагинацией нельзя)
+    fieldName: idName,  // Изначально по id (без сортировки с пагинацией нельзя)
     sortOrder: "ascend"
   }]);
   let [totalMax, setTotalMax] = React.useState(0); // Наибольшее количесвто выбранных записей
@@ -219,7 +221,7 @@ const Measure = ()=>{
     const gridDataOption = {
       pageNumber: pagination.current - 1,
       pageSize: pagination.pageSize,
-      sort: [{fieldName: "id"}] // Сортировка по умолчанию
+      sort: [{fieldName: idName}] // Сортировка по умолчанию !!!!!!!!!!!!!
     };
     if (sorters) { // Сортировка установлена - переустановим
       gridDataOption.sort[0].fieldName = sorters[0].fieldName;
@@ -315,7 +317,7 @@ const Measure = ()=>{
                 dataSource={data}
                 pagination={pagination}
                 onChange={handleTableChange}
-                rowKey="id"
+                rowKey={idName}
                 onRow={(record, rowIndex) => {
                   return {
                     onClick: event => callForm(record.id)

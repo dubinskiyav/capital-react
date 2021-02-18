@@ -30,14 +30,14 @@ const { SubMenu } = Menu;
 const columns = [
   {
     title: 'Наименование',
-    dataIndex: 'name',
+    dataIndex: 'unitmeasureName',
     sorter: {
       multiple: 1,
     },
   },
   {
     title: 'Сокращение',
-    dataIndex: 'shortName',
+    dataIndex: 'unitmeasureShortname',
     key: 'short_name', // Возможно это название поля в базе
     sorter: {
       multiple: 2,
@@ -45,7 +45,7 @@ const columns = [
   },
   {
     title: 'Приоритет',
-    dataIndex: 'priority',
+    dataIndex: 'measureunitPriority',
     sorter: {
       multiple: 3,
     },
@@ -60,7 +60,7 @@ const columns = [
     // Эта фильтрация - говно. Фильтрует уже выбранные данные
     // Валится, если measureName пустое
     filters: [ 
-      { text: 'Без меры измерения',       value:'Без меры измерения' },
+      { text: 'Без меры измерения',       value: 'Без меры измерения' },
       { text: 'Расстояние',               value: 'Расстояние' },
       { text: 'Вес',                      value: 'Вес' },
       { text: 'Время',                    value: 'Время' },
@@ -70,8 +70,10 @@ const columns = [
       { text: 'Сила света',               value: 'Сила света' },
     ],
     onFilter: (value, record) => record.measureName.includes(value),
-},
+  },
 ];
+
+const idName = "unitmeasureId";
 
 /**
  * Компонент для меры измерения
@@ -88,7 +90,7 @@ const Unitmeasure = ()=>{
     total: null, // общее количество считанных записей
   });
   let [sorters, setSorters] = React.useState([{ // Массив сортировки, 
-    fieldName: "id",  // Изначально по id (без сортировки с пагинацией нельзя)
+    fieldName: idName,  // Изначально по id (без сортировки с пагинацией нельзя)
     sortOrder: "ascend"
   }]);
   let [totalMax, setTotalMax] = React.useState(0); // Наибольшее количесвто выбранных записей
@@ -270,7 +272,7 @@ const Unitmeasure = ()=>{
     let gridDataOption = {
       pageNumber: pagination.current - 1,
       pageSize: pagination.pageSize,
-      sort: [{fieldName: "id", direction: 0}] // Сортировка по умолчанию
+      sort: [{fieldName: idName, direction: 0}] // Сортировка по умолчанию !!!!!!!!!!
     };
     if (sorters) { // Сортировка установлена - переустановим
       console.log('sorters = ' + JSON.stringify(sorters));
@@ -380,7 +382,7 @@ const Unitmeasure = ()=>{
                 dataSource={data}
                 pagination={pagination}
                 onChange={handleTableChange}
-                rowKey="id"
+                rowKey={idName}
                 onRow={(record, rowIndex) => {
                   return {
                     onClick: event => callForm(record.id)

@@ -160,7 +160,7 @@ const MeasureForm = (props)=>{
             initialValues={data}
         >
             <Form.Item
-                name="name"
+                name="measureName"
                 label="Наименование"
                 rules={[
                     {
