@@ -301,6 +301,11 @@ const Measure = ()=>{
                         О программе
                       </a>
                     </Menu.Item>
+                    <Menu.Item key="swagge">
+                    <a href={globalSettings.startURL + globalSettings.swaggerURI} target="_blank" rel="noopener noreferrer">
+                      Документация API
+                    </a>
+                  </Menu.Item>
                 </SubMenu>
               </Menu>
             </div>

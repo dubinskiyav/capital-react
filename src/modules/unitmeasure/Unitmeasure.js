@@ -21,6 +21,7 @@ const URI_ADD = URI_ROOT + "/add"
 const URI_UPD = URI_ROOT + "/upd" // для выборки записи по id
 const URI_POST = URI_ROOT + "/post"
 
+const swaggerURI = globalSettings.startURL + globalSettings.swaggerURI;
 
 const { Header, Content, Footer } = Layout;
 
@@ -361,11 +362,16 @@ const Unitmeasure = ()=>{
                 </SubMenu>
                 <SubMenu key="Spravka" title="Справка">
                   <Menu.Item key="help">Помощь</Menu.Item>
-                    <Menu.Item key="about">
-                      <a href="http://www.gelicon.biz/" target="_blank" rel="noopener noreferrer">
-                        О программе
-                      </a>
-                    </Menu.Item>
+                  <Menu.Item key="about">
+                    <a href="http://www.gelicon.biz/" target="_blank" rel="noopener noreferrer">
+                      О программе
+                    </a>
+                  </Menu.Item>
+                  <Menu.Item key="swagge">
+                    <a href={swaggerURI} target="_blank" rel="noopener noreferrer">
+                      Документация API
+                    </a>
+                  </Menu.Item>
                 </SubMenu>
               </Menu>
             </div>
