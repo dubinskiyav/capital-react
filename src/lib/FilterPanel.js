@@ -7,10 +7,10 @@ import {Space} from 'antd';
  */
 const FilterPanel = (props)=>{
     return (
-        <div className={'FilterPanel FilterPanel-' + props.color}>
-          {props.children}
-        </div>
-      );
+        <Space className="filter-panel">
+            {props.children}
+        </Space>
+    );
 }
 
 export default FilterPanel;

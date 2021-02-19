@@ -2,7 +2,7 @@ import React from 'react';
 import 'antd/dist/antd.css';
 import '../../resources/css/index.css';
 import '../../resources/css/capital.css';
-import { Layout, Menu, Modal,Form } from 'antd';
+import { Layout, Menu, Modal, Form, Checkbox } from 'antd';
 import { Table } from 'antd';
 import reqwest from 'reqwest';
 import { PlusOutlined, EditOutlined, CloseOutlined, PrinterOutlined } from '@ant-design/icons';
@@ -10,7 +10,9 @@ import Refresh from '../../icons/Refresh';
 import { notification } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import * as globalSettings from "../../lib/const";
+import FilterPanel from "../../lib/FilterPanel";
 import UnitmeasureForm from "./UnitmeasureForm";
+import HelpMenu from "../../lib/HelpMenu";
 
 // URI для использования формой добавления/изменения
 const URI_ROOT = globalSettings.startURL + "unitmeasure"
@@ -20,7 +22,6 @@ const URI_ADD = URI_ROOT + "/add"
 const URI_UPD = URI_ROOT + "/upd" // для выборки записи по id
 const URI_POST = URI_ROOT + "/post"
 
-const swaggerURI = globalSettings.startURL + globalSettings.swaggerURI;
 
 const { Header, Content, Footer } = Layout;
 
@@ -75,6 +76,16 @@ const columns = [
 
 const idName = "unitmeasureId";
 
+// Создание компонент для фильтров
+// key это уникальное имя фильтра, попадает в REST API
+const buildFilters = ()=>{
+  const measureUri = globalSettings.startURL + "measure/json";
+  return <div>
+      <Checkbox key="onlyMain">Только с наивысшим приоритетом</Checkbox>
+    </div>
+}
+
+
 /**
  * Компонент для меры измерения
  * @param {*} props 
@@ -95,6 +106,13 @@ const Unitmeasure = ()=>{
   }]);
   let [totalMax, setTotalMax] = React.useState(0); // Наибольшее количесвто выбранных записей
 
+  // Параметры запроса
+  let [requestParams] = React.useState({
+    pagination:{pagination}, // Непонятно надо ли пагинацию сюда сувать
+    filters: "1=1", // Фильтра нет
+  });
+
+
   let [formVisible,setFormVisible] = React.useState(false); // Видимость формы ввода
   let [editorContext] = React.useState({ // Данные для формы добавления-изменения
     uriForAdd: URI_ADD,
@@ -104,6 +122,11 @@ const Unitmeasure = ()=>{
   const [form] = Form.useForm(); // для эффекта
   let [filteredInfo, setFilteredInfo] = React.useState(0); // Фильтр
 
+  // Установка фильтра зля запроса
+  const setFilters = (filters) => {
+    requestParams.filters = filters;
+    refreshData();
+  }
 
   /**
    * Удаление записей
@@ -360,21 +383,12 @@ const Unitmeasure = ()=>{
                     <Menu.Item key="refresh" icon={<Refresh />}>Обновить</Menu.Item>
                     <Menu.Item key="print" icon={<PrinterOutlined />}>Печать</Menu.Item>
                 </SubMenu>
-                <SubMenu key="Spravka" title="Справка">
-                  <Menu.Item key="help">Помощь</Menu.Item>
-                  <Menu.Item key="about">
-                    <a href="http://www.gelicon.biz/" target="_blank" rel="noopener noreferrer">
-                      О программе
-                    </a>
-                  </Menu.Item>
-                  <Menu.Item key="swagge">
-                    <a href={swaggerURI} target="_blank" rel="noopener noreferrer">
-                      Документация API
-                    </a>
-                  </Menu.Item>
-                </SubMenu>
-              </Menu>
+                {HelpMenu()}
+             </Menu>
             </div>
+            <FilterPanel >
+              {buildFilters()} 
+            </FilterPanel>
           <Content>
             <div>
               <Table 

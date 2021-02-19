@@ -1,6 +1,5 @@
 import React from 'react';
 
-
 import CapitalModule from './CapitalModule';
 import CapitalHeader from './CapitalHeader';
 import CapitalFooter from './CapitalFooter';
