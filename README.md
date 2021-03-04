@@ -40,8 +40,11 @@
          https://www.npmjs.com/package/react-breadcrumbs-dynamic
           npm install --save react-through react-breadcrumbs-dynamic
           npm install --save react-router-dom
+		  
+15. Или установить все пакеты на которые есть зависимость в файле package.json
+			npm install
 
-15. Зайти в папку 
+16. Зайти в папку 
      capital-react\node_modules\react-scripts\config\
      найти файл webpackDevServer.config.js
     и в конец встаить
@@ -52,7 +55,7 @@
    вставить на одном уровне с after(app) {
   после должно быть две закрыв фигурные скобки с точками с запятой
        
-16. Зайти в папку capital-react и выполнить
+17. Зайти в папку capital-react и выполнить
        npm start
 
       запустится браузер и перенйдет на страницу localhost:3000 где можно будет увидеть зачатки программы
